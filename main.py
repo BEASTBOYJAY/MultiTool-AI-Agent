@@ -17,44 +17,34 @@ class Agent:
             memory_key="chat_history", return_messages=True
         )
 
-        template = """You are an intelligent, thoughtful AI assistant. 
-        You can reason carefully, use tools when needed, and communicate clearly.
+        template = """Answer the following questions as best you can. 
+        You have access to the following tools:
 
-        Your abilities:
-        - You can use the following tools when needed:
         {tools}
 
-        - You remember the conversation so far:
+        Previous conversation history:
         {chat_history}
 
-        When answering, follow this format:
-        ---
-        Question: [The question or instruction from the user]
+        Use the following format exactly:
 
-        Thought: [Think carefully about what is being asked. Plan step-by-step what you should do.]
+        Question: the input question you must answer
+        Thought: you should always think about what to do
+        (If you know the answer) Final Answer: your direct final answer (must begin with 'Final Answer:')
+        (If you need to use a tool) Action: the action to take, should be one of [{tool_names}]
+        Action Input: the input to the action
+        Observation: the result of the action
+        Thought: think what to do next
+        Final Answer: your final answer to the original question
 
-        (If you need to use a tool)
-        Action: [Select one tool to use, exactly as named in [{tool_names}]]
-        Action Input: [Provide the input for the tool]
+        Important rules:
+        - After every 'Thought:', you must either output 'Action:' or 'Final Answer:' immediately.
+        - Do not write responses without labeling them as 'Final Answer:'.
+        - Stay strictly inside the required format, otherwise the system will raise an error.
 
-        (After observing the tool's output)
-        Observation: [Record what you saw]
-
-        Thought: [Reflect on the observation. Decide if you can now answer, or need another action.]
-
-        Final Answer: [Give a clear, helpful answer to the user.]
-        ---
-
-        General rules:
-        - Be concise but thoughtful.
-        - Use tools only if necessary.
-        - If unsure, explain your reasoning honestly.
-        - Always aim to be accurate and helpful.
-
-        Now begin!
+        Begin!
 
         Question: {input}
-        {agent_scratchpad}
+        Thought:{agent_scratchpad}
         """
 
         self.prompt = PromptTemplate.from_template(template)
@@ -85,5 +75,5 @@ class Agent:
 
 
 if __name__ == "__main__":
-    agent = Agent(model_type="gemini")
+    agent = Agent(model_type="groq")
     agent.run()
