@@ -8,6 +8,33 @@ from langchain.tools import BaseTool
 import os
 
 
+class FileWriteTool(BaseTool):
+    name: str = "file_write_tool"
+    description: str = (
+        "A tool to write content to a file. Properly handles escaped characters like \\n."
+    )
+
+    def _run(self, file_path_and_content: str) -> str:
+        """Write the provided content into the specified file."""
+        try:
+
+            if "::" not in file_path_and_content:
+                return "Invalid input format. Use '<file_path>::<content>'."
+
+            file_path, content = file_path_and_content.split("::", 1)
+            content = content.encode("utf-8").decode("unicode_escape")
+
+            with open(file_path.strip(), "w") as f:
+                f.write(content)
+            return f"✅ Successfully wrote to {file_path.strip()}"
+        except Exception as e:
+            return f"❌ Error writing file: {e}"
+
+    def _arun(self, query: str) -> str:
+        """Asynchronous run, not used in this case."""
+        return self._run(query)
+
+
 class FileSearchTool(BaseTool):
     name: str = "file_search_tool"
     description: str = "A tool to search for files on the system."
@@ -76,7 +103,7 @@ class SafeShellTool(BaseTool):
             r"\byum\b",
             r"\bpip[\s]*install\b",
             r"\bconda[\s]*install\b",
-            r"\bcurl\b",
+            # r"\bcurl\b",
             r"\bwget\b",
             r"\bchmod\b",
             r"\bchown\b",
@@ -108,6 +135,7 @@ class Tools:
         self.shell_tool = SafeShellTool()
         self.file_search_tool = FileSearchTool()
         self.file_read_tool = FileReadTool()
+        self.file_write_tool = FileWriteTool()
 
     def run(self):
 
@@ -117,6 +145,7 @@ class Tools:
             self.shell_tool,
             self.file_search_tool,
             self.file_read_tool,
+            self.file_write_tool,
         ]
 
 
