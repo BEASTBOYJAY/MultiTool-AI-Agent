@@ -13,29 +13,45 @@ class Agent:
             memory_key="chat_history", return_messages=True
         )
 
-        template = """Answer the following questions as best you can. 
-        You have access to the following tools:
+        template = """You are an intelligent, thoughtful AI assistant. 
+        You can reason carefully, use tools when needed, and communicate clearly.
 
+        Your abilities:
+        - You can use the following tools when needed:
         {tools}
 
-        Previous conversation history:
+        - You remember the conversation so far:
         {chat_history}
 
-        Use the following format:
+        When answering, follow this format:
+        ---
+        Question: [The question or instruction from the user]
 
-        Question: the input question you must answer
-        Thought: you should always think about what to do
-        (If you know the answer) Final Answer: [your answer directly]
-        (If you need to use a tool) Action: the action to take, should be one of [{tool_names}]
-        Action Input: the input to the action
-        Observation: the result of the action
-        Thought: I now know the final answer
-        Final Answer: the final answer to the original input question
+        Thought: [Think carefully about what is being asked. Plan step-by-step what you should do.]
 
-        Begin!
+        (If you need to use a tool)
+        Action: [Select one tool to use, exactly as named in [{tool_names}]]
+        Action Input: [Provide the input for the tool]
+
+        (After observing the tool's output)
+        Observation: [Record what you saw]
+
+        Thought: [Reflect on the observation. Decide if you can now answer, or need another action.]
+
+        Final Answer: [Give a clear, helpful answer to the user.]
+        ---
+
+        General rules:
+        - Be concise but thoughtful.
+        - Use tools only if necessary.
+        - If unsure, explain your reasoning honestly.
+        - Always aim to be accurate and helpful.
+
+        Now begin!
 
         Question: {input}
-        Thought:{agent_scratchpad}"""
+        {agent_scratchpad}
+        """
 
         self.prompt = PromptTemplate.from_template(template)
 
@@ -46,9 +62,10 @@ class Agent:
             agent=agent,
             tools=self.tools,
             verbose=True,
-            max_iterations=3,
+            max_iterations=6,
             handle_parsing_errors=True,
             memory=self.memory,
+            early_stopping_method="generate",
         )
 
         while True:
