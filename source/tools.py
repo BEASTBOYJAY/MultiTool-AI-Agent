@@ -11,7 +11,7 @@ import os
 class FileWriteTool(BaseTool):
     name: str = "file_write_tool"
     description: str = (
-        "A tool to write content to a file. Properly handles escaped characters like \\n."
+        "A tool to write content to a file. Properly handles escaped characters like, make sure to Use '<file_path>::<content>' as input. \\n."
     )
 
     def _run(self, file_path_and_content: str) -> str:
