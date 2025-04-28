@@ -6,8 +6,12 @@ from langchain.memory import ConversationBufferMemory
 
 
 class Agent:
-    def __init__(self):
-        self.llm = llm_model().model()
+    def __init__(self, model_type: str):
+        if model_type == "gemini":
+            self.llm = llm_model().gemini_llm_model()
+        else:
+            self.llm = llm_model().groq_llm_model()
+
         self.tools = Tools().run()
         self.memory = ConversationBufferMemory(
             memory_key="chat_history", return_messages=True
@@ -62,10 +66,10 @@ class Agent:
             agent=agent,
             tools=self.tools,
             verbose=True,
-            max_iterations=6,
+            # max_iterations=6,
             handle_parsing_errors=True,
             memory=self.memory,
-            early_stopping_method="generate",
+            # early_stopping_method="generate",
         )
 
         while True:
@@ -81,5 +85,5 @@ class Agent:
 
 
 if __name__ == "__main__":
-    agent = Agent()
+    agent = Agent(model_type="gemini")
     agent.run()
